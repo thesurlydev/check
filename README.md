@@ -10,7 +10,7 @@ Bash script to check if a domain name, Twitter and GitHub username is available.
 
 By default the script will check availability of the following TLDs: `.com, .io, .net`
 
-These defaults can be changed by updating the TLDS array in the script.
+These defaults can be changed by updating the `TLDS` array in the script.
 
 Given an argument `foo`, the script will use `whois` to check domain name availability for: `foo.com, foo.io, foo.net`
 

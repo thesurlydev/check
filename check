@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# set -e
+
+if [ "$#" == "0" ]; then 
+    echo "Usage: check.sh <NAME>" 
+    exit 1
+fi
+
+TLDS=('.com' '.io' '.net')
+
+TWITTER_URL="https://twitter.com/$1"
+TWITTER_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $TWITTER_URL)
+GITHUB_URL="https://github.com/$1"
+GITHUB_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $GITHUB_URL)
+
+AVAIL_FORMAT=" %25s: \e[1m\e[32m%-10s\e[0m\n"
+TAKEN_FORMAT=" %25s: \e[1m\e[31m%-10s\e[0m\n"
+
+for tld in "${TLDS[@]}" ; do
+    domain="$1$tld"
+    $( whois $domain | egrep -q "^NOT FOUND|^No match" )
+    if [ $? -eq 0 ]; then
+        printf "$AVAIL_FORMAT" $domain AVAILABLE
+    else
+        printf "$TAKEN_FORMAT" $domain TAKEN
+    fi
+done
+
+echo
+
+if [ $GITHUB_STATUS -eq 200 ]; then
+    printf "$TAKEN_FORMAT" GitHub TAKEN
+else
+    printf "$AVAIL_FORMAT" GitHub AVAILABLE
+fi
+
+if [ $TWITTER_STATUS -eq 200 ]; then
+    printf "$TAKEN_FORMAT" Twitter TAKEN
+else
+    printf "$TAKEN_FORMAT" Twitter AVAILABLE
+fi
+
+echo

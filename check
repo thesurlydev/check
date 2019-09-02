@@ -36,7 +36,7 @@ fi
 if [ $TWITTER_STATUS -eq 200 ]; then
     printf "$TAKEN_FORMAT" Twitter TAKEN
 else
-    printf "$TAKEN_FORMAT" Twitter AVAILABLE
+    printf "$AVAIL_FORMAT" Twitter AVAILABLE
 fi
 
 echo

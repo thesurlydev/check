@@ -9,8 +9,12 @@ TLDS=('.com' '.io' '.net')
 
 TWITTER_URL="https://twitter.com/$1"
 TWITTER_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $TWITTER_URL)
+
 GITHUB_URL="https://github.com/$1"
 GITHUB_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $GITHUB_URL)
+
+INSTAGRAM_URL="https://www.instagram.com/$1/"
+INSTAGRAM_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $INSTAGRAM_URL)
 
 AVAIL_FORMAT=" %25s: \e[1m\e[32m%-10s\e[0m\n"
 TAKEN_FORMAT=" %25s: \e[1m\e[31m%-10s\e[0m\n"
@@ -31,6 +35,12 @@ if [ $GITHUB_STATUS -eq 200 ]; then
     printf "$TAKEN_FORMAT" GitHub TAKEN
 else
     printf "$AVAIL_FORMAT" GitHub AVAILABLE
+fi
+
+if [ $INSTAGRAM_STATUS -eq 200 ]; then
+    printf "$TAKEN_FORMAT" Instagram TAKEN
+else
+    printf "$AVAIL_FORMAT" Instagram AVAILABLE
 fi
 
 if [ $TWITTER_STATUS -eq 200 ]; then

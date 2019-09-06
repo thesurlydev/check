@@ -1,52 +1,46 @@
 #!/bin/bash
 
-if [ "$#" == "0" ]; then 
-    echo "Usage: check <NAME>" 
-    exit 1
+if [ "$#" == "0" ]; then
+  echo "Usage: check <NAME>"
+  exit 1
 fi
+
+NAME=$1
 
 TLDS=('.com' '.io' '.net')
 
-TWITTER_URL="https://twitter.com/$1"
-TWITTER_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $TWITTER_URL)
+declare -A SERVICES
+SERVICES=(
+  [GitHub]="https://github.com/$NAME"
+  [Instagram]="https://www.instagram.com/$NAME/"
+  [YouTube]="https://www.youtube.com/user/$NAME"
+)
 
-GITHUB_URL="https://github.com/$1"
-GITHUB_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $GITHUB_URL)
+print_result() {
+  label=$1;
+  res=$2;
+  exp_res=$3;
+  if [ $res -eq $exp_res ]; then
+    printf " %25s: \e[1m\e[32mAVAILABLE\e[0m\n" $label;
+  else
+    printf " %25s: \e[1m\e[31mTAKEN\e[0m\n" $label;
+  fi
+}
 
-INSTAGRAM_URL="https://www.instagram.com/$1/"
-INSTAGRAM_STATUS=$(curl -s -o /dev/null -w '%{http_code}' $INSTAGRAM_URL)
+check_tld(){
+  domain="$NAME$1"
+  whois $domain | grep -Ecq "^NOT FOUND|^No match"
+  result=$?
+  expected_result=0
+  print_result $domain $result $expected_result
+}
 
-AVAIL_FORMAT=" %25s: \e[1m\e[32m%-10s\e[0m\n"
-TAKEN_FORMAT=" %25s: \e[1m\e[31m%-10s\e[0m\n"
+check_svc(){
+  svc_name=$1
+  svc_url=${SERVICES[$svc_name]}
+  result=$(curl -s -o /dev/null -w '%{http_code}' "$svc_url")
+  print_result $svc_name $result 404
+}
 
-for tld in "${TLDS[@]}" ; do
-    domain="$1$tld"
-    $( whois $domain | egrep -q "^NOT FOUND|^No match" )
-    if [ $? -eq 0 ]; then
-        printf "$AVAIL_FORMAT" $domain AVAILABLE
-    else
-        printf "$TAKEN_FORMAT" $domain TAKEN
-    fi
-done
-
-echo
-
-if [ $GITHUB_STATUS -eq 200 ]; then
-    printf "$TAKEN_FORMAT" GitHub TAKEN
-else
-    printf "$AVAIL_FORMAT" GitHub AVAILABLE
-fi
-
-if [ $INSTAGRAM_STATUS -eq 200 ]; then
-    printf "$TAKEN_FORMAT" Instagram TAKEN
-else
-    printf "$AVAIL_FORMAT" Instagram AVAILABLE
-fi
-
-if [ $TWITTER_STATUS -eq 200 ]; then
-    printf "$TAKEN_FORMAT" Twitter TAKEN
-else
-    printf "$AVAIL_FORMAT" Twitter AVAILABLE
-fi
-
-echo
+for tld in "${TLDS[@]}"; do check_tld "$tld" & done; wait; echo
+for svc in "${!SERVICES[@]}"; do check_svc "$svc" & done; wait; echo

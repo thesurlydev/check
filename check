@@ -13,6 +13,7 @@ declare -A SERVICES
 SERVICES=(
   [GitHub]="https://github.com/$NAME"
   [Instagram]="https://www.instagram.com/$NAME/"
+  [Twitter]="https://www.twitter.com/$NAME"
   [YouTube]="https://www.youtube.com/user/$NAME"
 )
 

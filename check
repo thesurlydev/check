@@ -6,6 +6,7 @@ if [ "$#" == "0" ]; then
 fi
 
 NAME=$1
+OUTPUT=${2:-text}
 
 TLDS=('.com' '.io' '.net')
 
@@ -13,6 +14,7 @@ declare -A SERVICES
 SERVICES=(
   [GitHub]="https://github.com/$NAME"
   [Instagram]="https://www.instagram.com/$NAME/"
+  [Twitch]="https://m.twitch.tv/$NAME/profile"
   [Twitter]="https://www.twitter.com/$NAME"
   [YouTube]="https://www.youtube.com/user/$NAME"
 )
@@ -21,7 +23,7 @@ print_result() {
   label=$1;
   res=$2;
   exp_res=$3;
-  if [ $res -eq $exp_res ]; then
+  if [ $res -eq $exp_res ]; then    
     printf " %25s: \e[1m\e[32mAVAILABLE\e[0m\n" $label;
   else
     printf " %25s: \e[1m\e[31mTAKEN\e[0m\n" $label;
